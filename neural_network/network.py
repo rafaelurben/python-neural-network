@@ -5,7 +5,7 @@ import json
 class NeuralNetwork():
     """A neural network"""
 
-    def __init__(self, sizes: list, *, default_weight: float = 0.5, default_bias: float = 1):
+    def __init__(self, sizes: list, *, default_weight: float = 0.5, default_bias: float = 0):
         """The list ``sizes`` contains the number of neurons in the
         respective layers of the network. For example, if the list
         was [2, 3, 1] then it would be a three-layer network, with the
@@ -22,7 +22,7 @@ class NeuralNetwork():
             ] for i in range(1, len(sizes))
         ]
 
-    def add_layer(self, size, *, default_weight: float = 0.5, default_bias: float = 1):
+    def add_layer(self, size, *, default_weight: float = 0.5, default_bias: float = 0):
         "Add a layer"
 
         self.sizes.append(size)
@@ -51,7 +51,7 @@ class NeuralNetwork():
                         inputs[j] * self.weights[layerindex-1][i][j]
                         for j in range(lastlaylen)
                     ]
-                ) * self.biases[layerindex-1][i]
+                ) + self.biases[layerindex-1][i]
             )
             for i in range(currlaylen)
         ]
