@@ -25,7 +25,7 @@ class NeuralNetwork():
                 [default_weight for _ in range(sizes[i-1])] for _ in range(sizes[i])
             ] for i in range(1, len(sizes))
         ]
-        self.acfuncs: list[list] = [
+        self.actfuncs: list[list] = [
             [default_acfunc for _ in range(sizes[i])] for i in range(1, len(sizes))
         ]
 
@@ -43,7 +43,7 @@ class NeuralNetwork():
                 [default_weight for _ in range(self.sizes[-2])] for _ in range(self.sizes[-1])
             ]
         )
-        self.acfuncs.append([default_acfunc for _ in range(size)])
+        self.actfuncs.append([default_acfunc for _ in range(size)])
 
     # Processing
 
@@ -92,7 +92,7 @@ class NeuralNetwork():
             raise ValueError(
                 f"Invalid neuron index! Must be greater than 0 and smaller than {self.sizes[layerindex]}.")
 
-        acfunc = self.acfuncs[layerindex-1][neuronindex]
+        acfunc = self.actfuncs[layerindex-1][neuronindex]
 
         if isinstance(acfunc, str):
             if not acfunc in ACFUNCS:
@@ -124,6 +124,7 @@ class NeuralNetwork():
         newnetwork = cls(data["sizes"])
         newnetwork.biases = data["biases"]
         newnetwork.weights = data["weights"]
+        newnetwork.actfuncs = data["actfuncs"]
 
         return newnetwork
 
@@ -142,6 +143,7 @@ class NeuralNetwork():
             "sizes": self.sizes,
             "biases": self.biases,
             "weights": self.weights,
+            "actfuncs": self.actfuncs,
         }
         return json.dumps(data, indent=indent)
 
