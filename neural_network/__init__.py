@@ -1,2 +1,2 @@
-from . import activation_functions as ACFUNC
+from .activation_functions import ACFUNCS
 from .network import NeuralNetwork

@@ -1,18 +1,24 @@
 "NeuralNetwork by rafaelurben"
 
 import json
-from . import ACFUNC
+
+from numpy import isin
+from . import ACFUNCS
 
 
 class NeuralNetwork():
     """A neural network"""
 
-    def __init__(self, sizes: list, *, default_weight: float = 0.5, default_bias: float = 0):
+    def __init__(self, sizes: list, *, default_weight: float = 0.5, default_bias: float = 0, default_acfunc: str = "relu"):
         """The list ``sizes`` contains the number of neurons in the
         respective layers of the network. For example, if the list
         was [2, 3, 1] then it would be a three-layer network, with the
         first layer containing 2 neurons, the second layer 3 neurons,
         and the third layer 1 neuron."""
+
+        self._default_weight = default_weight
+        self._default_bias = default_bias
+        self._default_acfunc = default_acfunc
 
         self.sizes: list = sizes
         self.biases: list[list] = [
@@ -23,19 +29,25 @@ class NeuralNetwork():
                 [default_weight for _ in range(sizes[i-1])] for _ in range(sizes[i])
             ] for i in range(1, len(sizes))
         ]
+        self.acfuncs: list[list] = [
+            [default_acfunc for _ in range(sizes[i])] for i in range(1, len(sizes))
+        ]
 
-    def add_layer(self, size, *, default_weight: float = 0.5, default_bias: float = 0):
+    def add_layer(self, size):
         "Add a layer"
 
         self.sizes.append(size)
-        self.biases.append([default_bias for _ in range(size)])
+        self.biases.append([self._default_bias for _ in range(size)])
         self.weights.append(
             [
-                [default_weight for _ in range(self.sizes[-2])] for _ in range(self.sizes[-1])
+                [self._default_weight for _ in range(self.sizes[-2])] for _ in range(self.sizes[-1])
             ]
         )
+        self.acfuncs.append([self._default_acfunc for _ in range(size)])
 
-    def process_layer(self, inputs: list, layerindex: int):
+    # Processing
+
+    def _feed_forward_layer(self, inputs: list, layerindex: int):
         "Process a layer"
 
         currlaylen = self.sizes[layerindex]
@@ -49,24 +61,46 @@ class NeuralNetwork():
 
         result = [
             (
-                sum(
-                    [
-                        inputs[j] * self.weights[layerindex-1][i][j]
-                        for j in range(lastlaylen)
-                    ]
-                ) + self.biases[layerindex-1][i]
+                self._get_actfunc(layerindex, i)(
+                    sum(
+                        [
+                            inputs[j] * self.weights[layerindex-1][i][j]
+                            for j in range(lastlaylen)
+                        ]
+                    ) + self.biases[layerindex-1][i]
+                )
             )
             for i in range(currlaylen)
         ]
         return result
 
-    def process(self, inputs: list):
+    def feed_forward(self, inputs: list):
         "Process the inputs through the network"
 
         for index in range(1, len(self.sizes)):
-            inputs = self.process_layer(inputs, index)
+            inputs = self._feed_forward_layer(inputs, index)
 
         return inputs
+
+    def _get_actfunc(self, layerindex: int, neuronindex: int):
+        "Get the activation function of a neuron"
+
+        if not 0 < layerindex < len(self.sizes):
+            raise ValueError(
+                f"Invalid layer index! Must be greater than 0 and smaller than {len(self.sizes)}.")
+        if not 0 <= neuronindex < self.sizes[layerindex]:
+            raise ValueError(
+                f"Invalid neuron index! Must be greater than 0 and smaller than {self.sizes[layerindex]}.")
+
+        acfunc = self.acfuncs[layerindex-1][neuronindex]
+
+        if isinstance(acfunc, str):
+            if not acfunc in ACFUNCS:
+                raise ValueError(f"Invalid activation function name: {acfunc}")
+            return ACFUNCS[acfunc]
+
+        return acfunc
+
 
     # Import & Export
 
@@ -105,3 +139,7 @@ class NeuralNetwork():
 
         with open(filename, "w", encoding="utf8") as file:
             file.write(self.to_json(indent=indent))
+
+    def clone(self):
+        "Get a clone of the network"
+        return self.from_json(self.to_json())
