@@ -2,7 +2,6 @@
 
 import json
 
-from numpy import isin
 from . import ACFUNCS
 
 
