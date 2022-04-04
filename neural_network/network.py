@@ -100,6 +100,17 @@ class NeuralNetwork():
 
         return acfunc
 
+    # Adjusting
+
+    def adjust_random(self, amount):
+        "Adjust the weights and biases randomly"
+        for layerindex, _ in enumerate(self.sizes):
+            for neuronindex, _ in enumerate(self.biases[layerindex]):
+                self.biases[layerindex][neuronindex] += amount - (random.random() * 2 * amount)
+        for layerindex in range(len(self.sizes)-1):
+            for neuronindex, _ in enumerate(self.weights[layerindex]):
+                for nextneuronindex, _ in enumerate(self.weights[layerindex][neuronindex]):
+                    self.weights[layerindex][neuronindex][nextneuronindex] += amount - (random.random() * 2 * amount)
 
     # Import & Export
 
