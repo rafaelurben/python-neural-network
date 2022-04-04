@@ -1,6 +1,8 @@
 "NeuralNetwork by rafaelurben"
 
 import json
+from . import ACFUNC
+
 
 class NeuralNetwork():
     """A neural network"""
@@ -40,7 +42,8 @@ class NeuralNetwork():
         lastlaylen = self.sizes[layerindex-1]
 
         if not 0 < layerindex < len(self.sizes):
-            raise ValueError(f"Invalid layer index! Must be greater than 0 and smaller than {len(self.sizes)}.")
+            raise ValueError(
+                f"Invalid layer index! Must be greater than 0 and smaller than {len(self.sizes)}.")
         if len(inputs) != lastlaylen:
             raise ValueError("Invalid number of inputs.")
 
@@ -72,11 +75,11 @@ class NeuralNetwork():
         "Import the network from a json file"
 
         data: dict = json.loads(jsondata)
-        
+
         newnetwork = cls(data["sizes"])
         newnetwork.biases = data["biases"]
         newnetwork.weights = data["weights"]
-        
+
         return newnetwork
 
     @classmethod
