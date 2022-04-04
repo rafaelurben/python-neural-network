@@ -1,6 +1,7 @@
 "NeuralNetwork by rafaelurben"
 
 import json
+import random
 
 from . import ACFUNCS
 
@@ -15,10 +16,6 @@ class NeuralNetwork():
         first layer containing 2 neurons, the second layer 3 neurons,
         and the third layer 1 neuron."""
 
-        self._default_weight = default_weight
-        self._default_bias = default_bias
-        self._default_acfunc = default_acfunc
-
         self.sizes: list = sizes
         self.biases: list[list] = [
             [default_bias for _ in range(sizes[i])] for i in range(len(sizes))
@@ -32,17 +29,21 @@ class NeuralNetwork():
             [default_acfunc for _ in range(sizes[i])] for i in range(1, len(sizes))
         ]
 
-    def add_layer(self, size):
+    def __call__(self, inputs: list):
+        "Process the inputs through the network"
+        return self.feed_forward(inputs)
+
+    def add_layer(self, size, *, default_weight: float = 0.5, default_bias: float = 0, default_acfunc: str = "relu"):
         "Add a layer"
 
         self.sizes.append(size)
-        self.biases.append([self._default_bias for _ in range(size)])
+        self.biases.append([default_bias for _ in range(size)])
         self.weights.append(
             [
-                [self._default_weight for _ in range(self.sizes[-2])] for _ in range(self.sizes[-1])
+                [default_weight for _ in range(self.sizes[-2])] for _ in range(self.sizes[-1])
             ]
         )
-        self.acfuncs.append([self._default_acfunc for _ in range(size)])
+        self.acfuncs.append([default_acfunc for _ in range(size)])
 
     # Processing
 
