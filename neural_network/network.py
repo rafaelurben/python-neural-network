@@ -2,6 +2,7 @@
 
 import json
 import random
+from copy import deepcopy
 
 from . import ACFUNCS
 
@@ -103,15 +104,17 @@ class NeuralNetwork():
 
     # Adjusting
 
-    def adjust_random(self, amount):
+    def adjust_random(self, learning_rate, *, chance: float = 0.01):
         "Adjust the weights and biases randomly"
         for layerindex, _ in enumerate(self.sizes):
             for neuronindex, _ in enumerate(self.biases[layerindex]):
-                self.biases[layerindex][neuronindex] += amount - (random.random() * 2 * amount)
+                if random.random() < chance:
+                    self.biases[layerindex][neuronindex] += learning_rate - (random.random() * 2 * learning_rate)
         for layerindex in range(len(self.sizes)-1):
             for neuronindex, _ in enumerate(self.weights[layerindex]):
                 for nextneuronindex, _ in enumerate(self.weights[layerindex][neuronindex]):
-                    self.weights[layerindex][neuronindex][nextneuronindex] += amount - (random.random() * 2 * amount)
+                    if random.random() < chance:
+                        self.weights[layerindex][neuronindex][nextneuronindex] += learning_rate - (random.random() * 2 * learning_rate)
 
     # Import & Export
 
@@ -155,4 +158,9 @@ class NeuralNetwork():
 
     def clone(self):
         "Get a clone of the network"
-        return self.from_json(self.to_json())
+
+        newnetwork = self.__class__(self.sizes.copy())
+        newnetwork.biases = deepcopy(self.biases)
+        newnetwork.weights = deepcopy(self.weights)
+        newnetwork.actfuncs = deepcopy(self.actfuncs)
+        return newnetwork
