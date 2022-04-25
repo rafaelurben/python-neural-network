@@ -5,12 +5,13 @@ import random
 from copy import deepcopy
 
 from . import ACFUNCS
+from .utils import randplusminus
 
 
 class NeuralNetwork():
     """A neural network"""
 
-    def __init__(self, sizes: list, *, default_weight: float = 0.5, default_bias: float = 0, default_acfunc: str = "relu"):
+    def __init__(self, sizes: list, *, default_weight: float = None, default_bias: float = None, default_acfunc: str = "relu"):
         """The list ``sizes`` contains the number of neurons in the
         respective layers of the network. For example, if the list
         was [2, 3, 1] then it would be a three-layer network, with the
@@ -19,11 +20,11 @@ class NeuralNetwork():
 
         self.sizes: list = sizes
         self.biases: list[list] = [
-            [default_bias for _ in range(sizes[i])] for i in range(len(sizes))
+            [default_bias or randplusminus() for _ in range(sizes[i])] for i in range(len(sizes))
         ]
         self.weights: list[list[list]] = [
             [
-                [default_weight for _ in range(sizes[i-1])] for _ in range(sizes[i])
+                [default_weight or randplusminus() for _ in range(sizes[i-1])] for _ in range(sizes[i])
             ] for i in range(1, len(sizes))
         ]
         self.actfuncs: list[list] = [
@@ -34,14 +35,15 @@ class NeuralNetwork():
         "Process the inputs through the network"
         return self.feed_forward(inputs)
 
-    def add_layer(self, size, *, default_weight: float = 0.5, default_bias: float = 0, default_acfunc: str = "relu"):
+    def add_layer(self, size, *, default_weight: float = None, default_bias: float = None, default_acfunc: str = "relu"):
         "Add a layer"
 
         self.sizes.append(size)
-        self.biases.append([default_bias for _ in range(size)])
+        self.biases.append(
+            [default_bias or randplusminus() for _ in range(size)])
         self.weights.append(
             [
-                [default_weight for _ in range(self.sizes[-2])] for _ in range(self.sizes[-1])
+                [default_weight or randplusminus() for _ in range(self.sizes[-2])] for _ in range(self.sizes[-1])
             ]
         )
         self.actfuncs.append([default_acfunc for _ in range(size)])
@@ -109,12 +111,12 @@ class NeuralNetwork():
         for layerindex, _ in enumerate(self.sizes):
             for neuronindex, _ in enumerate(self.biases[layerindex]):
                 if random.random() < chance:
-                    self.biases[layerindex][neuronindex] += learning_rate - (random.random() * 2 * learning_rate)
+                    self.biases[layerindex][neuronindex] += randplusminus(learning_rate)
         for layerindex in range(len(self.sizes)-1):
             for neuronindex, _ in enumerate(self.weights[layerindex]):
                 for nextneuronindex, _ in enumerate(self.weights[layerindex][neuronindex]):
                     if random.random() < chance:
-                        self.weights[layerindex][neuronindex][nextneuronindex] += learning_rate - (random.random() * 2 * learning_rate)
+                        self.weights[layerindex][neuronindex][nextneuronindex] += randplusminus(learning_rate)
 
     # Import & Export
 
