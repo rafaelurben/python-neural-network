@@ -26,11 +26,16 @@ class NeuralNetwork():
         ]
         self.weights: list[list[list]] = [
             [
-                [default_weight or randplusminus() for _ in range(sizes[i-1])] for _ in range(sizes[i])
+                [
+                    default_weight or randplusminus()
+                    for _ in range(sizes[i-1])
+                ] for _ in range(sizes[i])
             ] for i in range(1, len(sizes))
         ]
         self.actfuncs: list[list] = [
-            [default_acfunc for _ in range(sizes[i])] for i in range(1, len(sizes))
+            [
+                default_acfunc for _ in range(sizes[i])
+            ] for i in range(1, len(sizes))
         ]
 
     def __call__(self, inputs: list):
@@ -42,13 +47,25 @@ class NeuralNetwork():
 
         self.sizes.append(size)
         self.biases.append(
-            [default_bias or randplusminus() for _ in range(size)])
-        self.weights.append(
             [
-                [default_weight or randplusminus() for _ in range(self.sizes[-2])] for _ in range(self.sizes[-1])
+                default_bias or randplusminus()
+                for _ in range(size)
             ]
         )
-        self.actfuncs.append([default_acfunc for _ in range(size)])
+        self.weights.append(
+            [
+                [
+                    default_weight or randplusminus()
+                    for _ in range(self.sizes[-2])
+                ] for _ in range(self.sizes[-1])
+            ]
+        )
+        self.actfuncs.append(
+            [
+                default_acfunc
+                for _ in range(size)
+            ]
+        )
 
     # Processing
 
@@ -124,7 +141,7 @@ class NeuralNetwork():
     @classmethod
     def from_dict(cls, data: dict):
         "Import a network from a dictionary"
-        
+
         newnetwork = cls(data["sizes"])
         newnetwork.biases = data["biases"]
         newnetwork.weights = data["weights"]
