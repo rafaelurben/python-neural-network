@@ -20,7 +20,9 @@ class NeuralNetwork():
 
         self.sizes: list = sizes
         self.biases: list[list] = [
-            [default_bias or randplusminus() for _ in range(sizes[i])] for i in range(len(sizes))
+            [
+                default_bias or randplusminus() for _ in range(sizes[i])
+            ] for i in range(1, len(sizes))
         ]
         self.weights: list[list[list]] = [
             [
@@ -108,14 +110,13 @@ class NeuralNetwork():
 
     def mutate(self, learning_rate, mutation_chance: float = 0.01):
         "Adjust the weights and biases randomly"
-        for layerindex, _ in enumerate(self.sizes):
-            for neuronindex, _ in enumerate(self.biases[layerindex]):
-                if random.random() < mutation_chance:
-                    self.biases[layerindex][neuronindex] += randplusminus(learning_rate)
         for layerindex in range(len(self.sizes)-1):
+            for neuronindex, _ in enumerate(self.biases[layerindex]):
+                if random.random() <= mutation_chance:
+                    self.biases[layerindex][neuronindex] += randplusminus(learning_rate)
             for neuronindex, _ in enumerate(self.weights[layerindex]):
                 for nextneuronindex, _ in enumerate(self.weights[layerindex][neuronindex]):
-                    if random.random() < mutation_chance:
+                    if random.random() <= mutation_chance:
                         self.weights[layerindex][neuronindex][nextneuronindex] += randplusminus(learning_rate)
 
     # Import & Export
