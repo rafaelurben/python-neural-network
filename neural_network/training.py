@@ -79,12 +79,11 @@ class NeuroEvolution():
         self.generation = data["generation"]
         network = NeuralNetwork.from_dict(data["network"])
         self.genomes.append(self._new_genome(network))
-        self.genomes.append(self._new_genome(network.clone()))
 
-        for _ in range(self.population_size-2):
+        for _ in range(self.population_size-1):
             self.genomes.append(None)
 
-        self._generate_genomes(self._get_learning_rate())
+        self._generate_genomes(self._get_learning_rate(), best_n=1)
 
         print("Loaded!")
 
@@ -122,9 +121,9 @@ class NeuroEvolution():
 
         print(f"Generation {self.generation} ended! Highscore: {highscore}")
 
-    def _generate_genomes(self, learning_rate):
-        for i in range(2, self.population_size):
-            orig = self.genomes[int(random.random())]
+    def _generate_genomes(self, learning_rate, best_n=2):
+        for i in range(best_n, self.population_size):
+            orig = self.genomes[int(random.random()*best_n)]
 
             network = orig.network.clone()
             network.mutate(learning_rate, self.mutation_chance)
