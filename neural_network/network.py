@@ -121,11 +121,9 @@ class NeuralNetwork():
     # Import & Export
 
     @classmethod
-    def from_json(cls, jsondata: str):
-        "Import the network from a json file"
-
-        data: dict = json.loads(jsondata)
-
+    def from_dict(cls, data: dict):
+        "Import a network from a dictionary"
+        
         newnetwork = cls(data["sizes"])
         newnetwork.biases = data["biases"]
         newnetwork.weights = data["weights"]
@@ -134,14 +132,21 @@ class NeuralNetwork():
         return newnetwork
 
     @classmethod
+    def from_json(cls, jsondata: str):
+        "Import the network from a json string"
+
+        data: dict = json.loads(jsondata)
+        return cls.from_dict(data)
+
+    @classmethod
     def from_json_file(cls, filename: str):
         "Import the network from a json file"
 
         with open(filename, "r", encoding="utf8") as file:
             return cls.from_json(file.read())
 
-    def to_json(self, indent: int = None):
-        "Export the network to a json file"
+    def to_dict(self):
+        "Export the network to a dictionary"
 
         data = {
             "_info": "NeuralNetwork generated with python-neural-network by rafaelurben",
@@ -150,7 +155,12 @@ class NeuralNetwork():
             "weights": self.weights,
             "actfuncs": self.actfuncs,
         }
-        return json.dumps(data, indent=indent)
+        return data
+
+    def to_json(self, indent: int = 4):
+        "Export the network to a json string"
+
+        return json.dumps(self.to_dict(), indent=indent)
 
     def to_json_file(self, filename: str, indent: int = 4):
         "Export the network to a json file"
