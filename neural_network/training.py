@@ -2,6 +2,7 @@
 
 import json
 import random
+import os
 from tqdm import tqdm
 
 from .network import NeuralNetwork
@@ -54,11 +55,20 @@ class NeuroEvolution():
     def _get_filename(self):
         return f"neuro-{self.name}-gen{str(self.generation).zfill(3)}.json"
 
+    def _find_latest_filename(self):
+        files = os.listdir(self.folder)
+        filestart = f"neuro-{self.name}-gen"
+        generations = [int(f.split(filestart)[1].split(".json")[0]) for f in files if f.startswith(filestart) and f.endswith(".json")]
+        youngest = max(generations)
+        return f"neuro-{self.name}-gen{str(youngest).zfill(3)}.json"
+
     def setup_from_scratch(self):
         for _ in range(self.population_size):
             self.genomes.append(self._new_genome(self._get_default_network()))
 
-    def setup_from_file(self, filename):
+    def setup_from_file(self, filename:str=None):
+        filename = filename or self._find_latest_filename()
+
         print(f"Loading from file '{filename}'...", end=" ")
 
         with open(self.folder+filename, "r", encoding="utf-8") as file:
@@ -67,7 +77,7 @@ class NeuroEvolution():
         self.generation = data["generation"]
         network = NeuralNetwork.from_dict(data["network"])
         self.genomes.append(self._new_genome(network))
-        self.genomes.append(self._new_genome(network))
+        self.genomes.append(self._new_genome(network.clone()))
 
         for _ in range(self.population_size-2):
             self.genomes.append(None)
@@ -99,7 +109,7 @@ class NeuroEvolution():
         if self.generation > 0:
             # No need to generate genomes in generation 0!
             self._generate_genomes(learning_rate)
-        
+
         print("Done! Running training...")
 
         for genome in tqdm(self.genomes, desc=f"Generation {self.generation}"):
