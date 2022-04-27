@@ -59,6 +59,8 @@ class NeuroEvolution():
         files = os.listdir(self.folder)
         filestart = f"neuro-{self.name}-gen"
         generations = [int(f.split(filestart)[1].split(".json")[0]) for f in files if f.startswith(filestart) and f.endswith(".json")]
+        if not generations:
+            raise FileNotFoundError(f"No files found in '{self.folder}' with prefix '{filestart}'")
         youngest = max(generations)
         return f"neuro-{self.name}-gen{str(youngest).zfill(3)}.json"
 
