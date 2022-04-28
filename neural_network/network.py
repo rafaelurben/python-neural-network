@@ -194,3 +194,10 @@ class NeuralNetwork():
         newnetwork.weights = deepcopy(self.weights)
         newnetwork.actfuncs = deepcopy(self.actfuncs)
         return newnetwork
+
+    def clone_and_mutate(self, learning_rate, mutation_chance: float = 0.01):
+        "Get a clone of the network and mutate it"
+
+        newnetwork = self.clone()
+        newnetwork.mutate(learning_rate=learning_rate, mutation_chance=mutation_chance)
+        return newnetwork
