@@ -22,8 +22,6 @@ class NeuroEvolution(NeuralManager):
         self.genome_setup_args = genome_setup_args
         self.genome_setup_kwargs = genome_setup_kwargs
 
-        self.default_network: NeuralNetwork = None
-
         super().__init__(name, folder)
 
         self.__is_setup_done = False
@@ -70,6 +68,11 @@ class NeuroEvolution(NeuralManager):
         for networkdict in data["networks"]:
             network = NeuralNetwork.from_dict(networkdict)
             self.genomes.append(self._new_genome(network))
+
+        # If population size was made bigger, add random genomes to fill up the gap
+        if len(self.genomes) < self.population_size:
+            for _ in range(self.population_size - len(self.genomes)):
+                self.genomes.append(self._new_genome(self._get_default_network()))
 
         self.__is_setup_done = True
 
@@ -138,6 +141,4 @@ class NeuroEvolution(NeuralManager):
         return self.learning_rate_base * (self.learning_rate_factor ** self.generation)
 
     def _get_default_network(self):
-        if isinstance(getattr(self, "default_network", None), NeuralNetwork):
-            return self.default_network.clone()
         raise NotImplementedError
