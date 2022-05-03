@@ -126,7 +126,7 @@ class NeuroEvolution(NeuralManager):
 
         print("Done! Running training...")
 
-        for genome in tqdm(self.genomes, desc=f"Generation {self.generation}"):
+        for genome in tqdm(self.genomes[:self.population_size], desc=f"Generation {self.generation}"):
             genome.run_evaluation(self.generation)
 
         self._sort_genomes()
