@@ -1,7 +1,7 @@
 import tkinter
 
 class TrainingGUI(tkinter.Tk):
-    def __init__(self, trainer, *args, **kwargs):
+    def __init__(self, trainer, alwaysontop=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self._nn_trainer = trainer
@@ -93,10 +93,32 @@ class TrainingGUI(tkinter.Tk):
         label.configure(font=("Arial", 12))
         label.grid(row=h, column=0, columnspan=2, sticky="w", padx=10)
 
-        self._nn_l_state = tkinter.Label(self, text="Idle...", bg='#000', fg='#FFF')
+        self._nn_l_state = tkinter.Label(self, text="Idle.", bg='#000', fg='#FFF')
         self._nn_l_state.configure(font=("Arial", 12))
         self._nn_l_state.grid(row=h, column=2, columnspan=2, sticky="w", padx=10)
         h += 1
+        
+        label = tkinter.Label(self, text="Folder", bg='#000', fg='#FFF')
+        label.configure(font=("Arial", 12))
+        label.grid(row=h, column=0, columnspan=2, sticky="w", padx=10)
+
+        self._nn_l_folder = tkinter.Label(self, text=trainer.folder, bg='#000', fg='#FFF')
+        self._nn_l_folder.configure(font=("Arial", 12))
+        self._nn_l_folder.grid(row=h, column=2, columnspan=2, sticky="w", padx=10)
+        h += 1
+        
+        label = tkinter.Label(self, text="Name", bg='#000', fg='#FFF')
+        label.configure(font=("Arial", 12))
+        label.grid(row=h, column=0, columnspan=2, sticky="w", padx=10)
+
+        self._nn_l_name = tkinter.Label(self, text=trainer.name, bg='#000', fg='#FFF')
+        self._nn_l_name.configure(font=("Arial", 12))
+        self._nn_l_name.grid(row=h, column=2, columnspan=2, sticky="w", padx=10)
+        h += 1
+
+        # Always on top
+        if alwaysontop:
+            self.call('wm', 'attributes', '.', '-topmost', '1')
 
     def _nn_interrupt(self):
         self._nn_interrupted = True
