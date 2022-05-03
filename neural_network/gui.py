@@ -157,7 +157,7 @@ class TrainingGUI(tkinter.Tk):
             self.update()
 
             highscore = self._nn_trainer.run_generation()
-            generation = self._nn_trainer.generation+1
+            generation = self._nn_trainer.generation
 
             self._nn_l_generation.configure(text=str(generation))
             self._nn_l_score.configure(text=str(highscore))
