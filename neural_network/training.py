@@ -10,6 +10,11 @@ from .manager import NeuralManager, Genome
 class NeuroEvolution(NeuralManager):
     "Neural network training using the neuro evolution technique"
 
+    EDITABLE_FIELS = [
+        'learning_rate_base', 'learning_rate_factor', 'mutation_chance',
+        'population_size', 'repop_amount_keep', 'repop_amount_random_add',
+        'repop_amount_random_mutate', 'repop_best_n']
+
     def __init__(self, genome_class, *genome_setup_args, name="neuro", folder="../data/", **genome_setup_kwargs):
         self.learning_rate_base = 0.01
         self.learning_rate_factor = 0.95
@@ -40,7 +45,7 @@ class NeuroEvolution(NeuralManager):
         self.genomes: typing.List[Genome] = []
         self.__is_setup_done = False
 
-    def _get_repopulate_rest(self):
+    def _get_repopulate_rest(self) -> int:
         "Get the remaining population size after subtracting the other repopulate settings"
 
         rest = self.population_size - self.repop_amount_keep - self.repop_amount_random_add - self.repop_amount_random_mutate
@@ -48,17 +53,21 @@ class NeuroEvolution(NeuralManager):
             raise AssertionError("Population size is too small!")
         return rest
 
-    def _new_genome(self, network: NeuralNetwork):
+    def _new_genome(self, network: NeuralNetwork) -> Genome:
         "Create a new genome"
 
         genome = self.genome_class(network)
         genome.setup(*self.genome_setup_args, **self.genome_setup_kwargs)
         return genome
 
-    def _create_random_genomes(self, amount):
+    def _create_random_genomes(self, amount) -> typing.List[Genome]:
+        "Create random genomes with new networks via the _get_default_network() method"
+
         return [self._new_genome(self._get_default_network()) for _ in range(amount)]
 
-    def setup_from_scratch(self):
+    def setup_from_scratch(self) -> None:
+        "SETUP: Create a completely new population"
+
         if self.__is_setup_done:
             raise AssertionError("Already setup!")
 
@@ -67,7 +76,9 @@ class NeuroEvolution(NeuralManager):
 
         self.__is_setup_done = True
 
-    def setup_from_file(self, filename:str=None):
+    def setup_from_file(self, filename:str=None) -> None:
+        "SETUP: Load the population from a file"
+
         if self.__is_setup_done:
             raise AssertionError("Already setup!")
 
@@ -84,20 +95,26 @@ class NeuroEvolution(NeuralManager):
 
         self.__is_setup_done = True
 
-    def setup_auto(self):
+    def setup_auto(self) -> None:
+        "SETUP: Try to load the population from a file, if it exists, otherwise create a new population"
+
         try:
             self.setup_from_file()
         except FileNotFoundError:
             self.setup_from_scratch()
 
-    def save_to_file(self, filename:str=None):
+    def save_to_file(self, filename:str=None) -> None:
+        "Save the population to a file"
+
         data = {
             "networks": list(map(lambda g: g.network.to_dict(), self.genomes)),
             "generation": self.generation,
         }
         self._save_data_to_file(data, filename)
 
-    def run_generation(self):
+    def run_generation(self) -> float:
+        "Run a generation - return highscore"
+
         self.generation += 1
         learning_rate = self._get_learning_rate()
 
@@ -116,8 +133,11 @@ class NeuroEvolution(NeuralManager):
         highscore = self.genomes[0].score
 
         print(f"Generation {self.generation} ended! Highscore: {highscore}")
+        return highscore
 
-    def _generate_genomes(self, learning_rate):
+    def _generate_genomes(self, learning_rate) -> None:
+        "Generate new genomes based on the success of the previous ones"
+
         oldgenomes = self.genomes
         newgenomes = []
 
@@ -142,11 +162,19 @@ class NeuroEvolution(NeuralManager):
 
         self.genomes = newgenomes
 
-    def _sort_genomes(self):
+    def _sort_genomes(self) -> None:
+        "Sort the genomes by score"
+
         self.genomes.sort(key=lambda genome: genome.score, reverse=True)
 
     def _get_learning_rate(self):
+        "Calculate the learning rate for the current generation"
+
         return self.learning_rate_base * (self.learning_rate_factor ** self.generation)
 
     def _get_default_network(self):
+        """
+        Create a new network -> HAS to be overriden if creating a network from scratch
+        or if repop_amount_random_add > 0
+        """
         raise NotImplementedError
