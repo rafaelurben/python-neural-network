@@ -10,7 +10,7 @@ from .manager import NeuralManager, Genome
 class NeuroEvolution(NeuralManager):
     "Neural network training using the neuro evolution technique"
 
-    EDITABLE_FIELS = [
+    EDITABLE_FIELDS = [
         'learning_rate_base', 'learning_rate_factor', 'mutation_chance',
         'population_size', 'repop_amount_keep', 'repop_amount_random_add',
         'repop_amount_random_mutate', 'repop_best_n']
