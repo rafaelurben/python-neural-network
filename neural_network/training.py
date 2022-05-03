@@ -8,41 +8,49 @@ from .network import NeuralNetwork
 from .manager import NeuralManager, Genome
 
 class NeuroEvolution(NeuralManager):
-    "Base class for neural network training using NeuroEvolution"
+    "Neural network training using the neuro evolution technique"
 
     def __init__(self, genome_class, *genome_setup_args, name="neuro", folder="../data/", **genome_setup_kwargs):
         self.learning_rate_base = 0.01
         self.learning_rate_factor = 0.95
+
+        # Chance of mutating a bias or weight
         self.mutation_chance = 0.05
 
-        self.set_population_size(100)
+        # Total size of a population
+        self.population_size = 100
 
-        self.genomes: typing.List[Genome] = []
+        # Settings for repopulation (before every generation)
+        # 1: Best _ genomes will be kept unmutated.
+        self.repop_amount_keep = 5
+        # 2: _ genomes will be created randomly.
+        self.repop_amount_random_add = 0
+        # 3: _ genomes will be mutations of any old genomes.
+        self.repop_amount_random_mutate = 0
+        # 4: The rest of the population will be mutations of the top _ genomes.
+        self.repop_best_n = 5
+
+        # Settings used for the generation of new genomes
         self.genome_class = genome_class
         self.genome_setup_args = genome_setup_args
         self.genome_setup_kwargs = genome_setup_kwargs
 
         super().__init__(name, folder)
 
+        self.genomes: typing.List[Genome] = []
         self.__is_setup_done = False
 
-    def set_population_size(self, size: int):
-        "Set the size of the population and the repopulation options relative to it"
-        self.population_size = size
-
-        # Best _ genomes will be kept in the population
-        self.repopulate_keep = int(0.05*size)
-        # _ genomes will be added randomly
-        self.repopulate_random_add = int(0.05*size)
-        # _ genomes will be mutations of any old genomes
-        self.repopulate_random_mutate = int(0.05*size)
-        # The rest of the population will be mutations of the top _ genomes.
-        self.repopulate_best_n = int(0.05*size)
-
     def _get_repopulate_rest(self):
-        return self.population_size - self.repopulate_keep - self.repopulate_random_add - self.repopulate_random_mutate
+        "Get the remaining population size after subtracting the other repopulate settings"
+
+        rest = self.population_size - self.repop_amount_keep - self.repop_amount_random_add - self.repop_amount_random_mutate
+        if rest < 0:
+            raise AssertionError("Population size is too small!")
+        return rest
 
     def _new_genome(self, network: NeuralNetwork):
+        "Create a new genome"
+
         genome = self.genome_class(network)
         genome.setup(*self.genome_setup_args, **self.genome_setup_kwargs)
         return genome
@@ -113,9 +121,9 @@ class NeuroEvolution(NeuralManager):
         oldgenomes = self.genomes
         newgenomes = []
 
-        newgenomes += self._create_random_genomes(self.repopulate_random_add)
+        newgenomes += self._create_random_genomes(self.repop_amount_random_add)
 
-        indexes_to_keep = range(self.repopulate_keep)
+        indexes_to_keep = range(self.repop_amount_keep)
 
         for i in indexes_to_keep:
             orig = oldgenomes[i]
@@ -123,8 +131,8 @@ class NeuroEvolution(NeuralManager):
             network = orig.network.clone()
             newgenomes.append(self._new_genome(network))
 
-        indexes_to_mutate = random.choices(range(self.population_size), k=self.repopulate_random_mutate)
-        indexes_to_mutate += random.choices(range(self.repopulate_best_n), k=self._get_repopulate_rest())
+        indexes_to_mutate = random.choices(range(self.population_size), k=self.repop_amount_random_mutate)
+        indexes_to_mutate += random.choices(range(self.repop_best_n), k=self._get_repopulate_rest())
 
         for i in indexes_to_mutate:
             orig = oldgenomes[i]
