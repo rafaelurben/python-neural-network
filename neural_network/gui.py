@@ -128,8 +128,10 @@ class TrainingGUI(tkinter.Tk):
                 print("Interrupted!")
                 break
 
+            self._nn_e_runs.config(state="normal")
             self._nn_e_runs.delete(0, tkinter.END)
             self._nn_e_runs.insert(0, str(count))
+            self._nn_e_runs.config(state="disabled")
             self.update()
 
             highscore = self._nn_trainer.run_generation()
@@ -143,15 +145,16 @@ class TrainingGUI(tkinter.Tk):
 
             count -= 1
 
-        self._nn_l_state.configure(text="Idle.")
-        self._nn_e_runs.delete(0, tkinter.END)
-        self._nn_e_runs.insert(0, "0")
 
         self._nn_e_runs.config(state="normal")
         self._nn_b_interrupt.config(state="disabled")
         self._nn_b_run_once.config(state="normal")
         self._nn_b_run_entry_times.config(state="normal")
         self._nn_b_run_infinite.config(state="normal")
+
+        self._nn_l_state.configure(text="Idle.")
+        self._nn_e_runs.delete(0, tkinter.END)
+        self._nn_e_runs.insert(0, "0")
         self.update()
 
     def _nn_run_once(self):
