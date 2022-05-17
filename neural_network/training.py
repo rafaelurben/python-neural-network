@@ -107,6 +107,7 @@ class NeuroEvolution(NeuralManager):
         "Save the population to a file"
 
         data = {
+            "highscore": self.genomes[0].score,
             "networks": list(map(lambda g: g.network.to_dict(), self.genomes)),
             "generation": self.generation,
         }

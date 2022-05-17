@@ -68,6 +68,11 @@ class NeuralManager():
 
         print(f"Saving to file '{filename}'...", end=" ")
 
+        data["_info"] = "NeuralManager export created with python-neural-network by rafaelurben"
+        data["_url"] = "https://github.com/rafaelurben/python-neural-network"
+        data["_folder"] = self.folder
+        data["_name"] = self.name
+
         with open(self.folder+filename, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4)
 
