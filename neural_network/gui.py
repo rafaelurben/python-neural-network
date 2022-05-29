@@ -71,7 +71,7 @@ class TrainingGUI(tkinter.Tk):
         label.grid(row=h, column=0, columnspan=4, sticky="n")
         h += 1
 
-        label = tkinter.Label(self, text="Generation", bg='#000', fg='#FFF')
+        label = tkinter.Label(self, text="Last Generation", bg='#000', fg='#FFF')
         label.configure(font=("Arial", 12))
         label.grid(row=h, column=0, columnspan=2, sticky="w", padx=10)
 
