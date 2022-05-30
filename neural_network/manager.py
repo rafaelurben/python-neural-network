@@ -37,7 +37,9 @@ class NeuralManager():
 
         os.makedirs(self.folder, exist_ok=True)
 
-    def _get_filename(self) -> str:
+    def _get_filename(self, for_export=False) -> str:
+        if for_export:
+            return f"neuro-{self.name}-export.json"
         return f"neuro-{self.name}-gen{str(self.generation).zfill(3)}.json"
 
     def _find_latest_filename(self) -> str:
@@ -63,17 +65,35 @@ class NeuralManager():
         print(f"Found generation {self.generation}!")
         return data
 
-    def _save_data_to_file(self, data: dict, filename: str = None) -> None:
+    def _save_state_to_file(self, data: dict, filename: str = None) -> None:
         filename = filename or self._get_filename()
 
-        print(f"Saving to file '{filename}'...", end=" ")
+        print(f"Saving state to file '{filename}'...", end=" ")
 
-        data["_info"] = "NeuralManager export created with python-neural-network by rafaelurben"
-        data["_url"] = "https://github.com/rafaelurben/python-neural-network"
-        data["_folder"] = self.folder
-        data["_name"] = self.name
+        data = {
+            "_info": "NeuralManager save - can be used to continue training",
+            "_generated_by": "https://github.com/rafaelurben/python-neural-network",
+            **data
+        }
 
         with open(self.folder+filename, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4)
 
         print("Saved!")
+
+    def _export_network_to_file(self, network: NeuralNetwork, filename: str = None) -> None:
+        filename = filename or self._get_filename(for_export=True)
+
+        print(f"Exporting network to file '{filename}'...", end=" ")
+
+        data = {
+            "_info": "NeuralNetwork export - can be used for evaluating/using the network",
+            "_generated_by": "https://github.com/rafaelurben/python-neural-network",
+            "generation": self.generation,
+            "network": network.to_dict()
+        }
+
+        with open(self.folder+filename, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4)
+
+        print("Exported!")

@@ -108,10 +108,13 @@ class NeuroEvolution(NeuralManager):
 
         data = {
             "highscore": self.genomes[0].score,
-            "networks": list(map(lambda g: g.network.to_dict(), self.genomes)),
             "generation": self.generation,
+            "networks": list(map(lambda g: g.network.to_dict(), self.genomes)),
         }
-        self._save_data_to_file(data, filename)
+        self._save_state_to_file(data, filename)
+
+    def export_network_to_file(self, filename: str = None) -> None:
+        return self._export_network_to_file(self.genomes[0].network, filename)
 
     def run_generation(self) -> float:
         "Run a generation - return highscore"

@@ -167,8 +167,6 @@ class NeuralNetwork():
         "Export the network to a dictionary"
 
         data = {
-            "_info": "NeuralNetwork generated with python-neural-network by rafaelurben",
-            "_url": "https://github.com/rafaelurben/python-neural-network",
             "sizes": self.sizes,
             "biases": self.biases,
             "weights": self.weights,
