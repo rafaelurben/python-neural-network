@@ -3,7 +3,7 @@
 import json
 
 from .network import NeuralNetwork
-from .manager import NeuralManager, Genome
+from .manager import NeuralManager
 
 class NeuroLoader(NeuralManager):
     "Class used to load a NeuralNetwork from a NeuralManager export"

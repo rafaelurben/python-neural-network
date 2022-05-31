@@ -5,7 +5,8 @@ import typing
 from tqdm import tqdm
 
 from .network import NeuralNetwork
-from .manager import NeuralManager, Genome
+from .manager import NeuralManager
+from .genome import Genome
 
 class NeuroEvolution(NeuralManager):
     "Neural network training using the neuro evolution technique"
