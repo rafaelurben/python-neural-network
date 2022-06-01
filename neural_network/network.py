@@ -12,11 +12,13 @@ class NeuralNetwork():
     """A neural network"""
 
     def __init__(self, sizes: list, *, default_weight: float = None, default_bias: float = None, default_acfunc: str = "relu"):
-        """The list ``sizes`` contains the number of neurons in the
+        """
+        The list ``sizes`` contains the number of neurons in the
         respective layers of the network. For example, if the list
         was [2, 3, 1] then it would be a three-layer network, with the
         first layer containing 2 neurons, the second layer 3 neurons,
-        and the third layer 1 neuron."""
+        and the third layer 1 neuron.
+        """
 
         self.sizes: list = sizes
         self.biases: list[list] = [
@@ -39,10 +41,14 @@ class NeuralNetwork():
         ]
 
     def __call__(self, inputs: list):
-        "Process the inputs through the network"
+        """
+        Process the inputs through the network
+
+        instance() is a shortcut for instance.feed_forward()
+        """
         return self.feed_forward(inputs)
 
-    def add_layer(self, size, *, default_weight: float = None, default_bias: float = None, default_acfunc: str = "relu"):
+    def add_layer(self, size, *, default_weight: float = None, default_bias: float = None, default_acfunc: str = "relu") -> None:
         "Add a layer"
 
         self.sizes.append(size)
@@ -69,7 +75,7 @@ class NeuralNetwork():
 
     # Processing
 
-    def _feed_forward_layer(self, inputs: list, layerindex: int):
+    def _feed_forward_layer(self, inputs: list, layerindex: int) -> list:
         "Process a layer"
 
         currlaylen = self.sizes[layerindex]
@@ -96,7 +102,7 @@ class NeuralNetwork():
         ]
         return result
 
-    def feed_forward(self, inputs: list):
+    def feed_forward(self, inputs: list) -> list:
         "Process the inputs through the network"
 
         for index in range(1, len(self.sizes)):
@@ -104,7 +110,7 @@ class NeuralNetwork():
 
         return inputs
 
-    def _get_actfunc(self, layerindex: int, neuronindex: int):
+    def _get_actfunc(self, layerindex: int, neuronindex: int) -> "function":
         "Get the activation function of a neuron"
 
         if not 0 < layerindex < len(self.sizes):
@@ -125,7 +131,7 @@ class NeuralNetwork():
 
     # Adjusting
 
-    def mutate(self, learning_rate, mutation_chance: float = 0.01):
+    def mutate(self, learning_rate, mutation_chance: float = 0.01) -> None:
         "Adjust the weights and biases randomly"
         for layerindex in range(len(self.sizes)-1):
             for neuronindex, _ in enumerate(self.biases[layerindex]):
@@ -139,7 +145,7 @@ class NeuralNetwork():
     # Import & Export
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: dict) -> "NeuralNetwork":
         "Import a network from a dictionary"
 
         newnetwork = cls(data["sizes"])
@@ -150,20 +156,20 @@ class NeuralNetwork():
         return newnetwork
 
     @classmethod
-    def from_json(cls, jsondata: str):
+    def from_json(cls, jsondata: str) -> "NeuralNetwork":
         "Import the network from a json string"
 
         data: dict = json.loads(jsondata)
         return cls.from_dict(data)
 
     @classmethod
-    def from_json_file(cls, filename: str):
+    def from_json_file(cls, filename: str) -> "NeuralNetwork":
         "Import the network from a json file"
 
         with open(filename, "r", encoding="utf8") as file:
             return cls.from_json(file.read())
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         "Export the network to a dictionary"
 
         data = {
@@ -174,18 +180,18 @@ class NeuralNetwork():
         }
         return data
 
-    def to_json(self, indent: int = 4):
+    def to_json(self, indent: int = 4) -> str:
         "Export the network to a json string"
 
         return json.dumps(self.to_dict(), indent=indent)
 
-    def to_json_file(self, filename: str, indent: int = 4):
+    def to_json_file(self, filename: str, indent: int = 4) -> None:
         "Export the network to a json file"
 
         with open(filename, "w", encoding="utf8") as file:
             file.write(self.to_json(indent=indent))
 
-    def clone(self):
+    def clone(self) -> "NeuralNetwork":
         "Get a clone of the network"
 
         newnetwork = self.__class__(self.sizes.copy())
@@ -194,7 +200,7 @@ class NeuralNetwork():
         newnetwork.actfuncs = deepcopy(self.actfuncs)
         return newnetwork
 
-    def clone_and_mutate(self, learning_rate, mutation_chance: float = 0.01):
+    def clone_and_mutate(self, learning_rate, mutation_chance: float = 0.01) -> "NeuralNetwork":
         "Get a clone of the network and mutate it"
 
         newnetwork = self.clone()

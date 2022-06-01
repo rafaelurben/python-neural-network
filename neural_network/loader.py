@@ -24,6 +24,8 @@ class NeuroLoader(NeuralManager):
         self.network = NeuralNetwork.from_dict(data["network"])
 
     def get_genome(self, genome_class, *genome_setup_args,  **genome_setup_kwargs):
+        "Create a genome with the selected options and the stored network"
+
         genome = genome_class(self.network)
         genome.setup(*genome_setup_args, **genome_setup_kwargs)
         return genome

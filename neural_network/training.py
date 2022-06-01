@@ -55,7 +55,7 @@ class NeuroEvolution(NeuralManager):
         return rest
 
     def _new_genome(self, network: NeuralNetwork) -> Genome:
-        "Create a new genome"
+        "Create a new genome based on the stored options"
 
         genome = self.genome_class(network)
         genome.setup(*self.genome_setup_args, **self.genome_setup_kwargs)
@@ -97,7 +97,7 @@ class NeuroEvolution(NeuralManager):
         self.__is_setup_done = True
 
     def setup_auto(self) -> None:
-        "SETUP: Try to load the population from a file, if it exists, otherwise create a new population"
+        "SETUP: Load the population from a file, if it exists, otherwise creates a new population"
 
         try:
             self.setup_from_file()
@@ -105,7 +105,7 @@ class NeuroEvolution(NeuralManager):
             self.setup_from_scratch()
 
     def save_to_file(self, filename:str=None) -> None:
-        "Save the population to a file"
+        "Save all networks to a file (used to resume learning later)"
 
         data = {
             "highscore": self.genomes[0].score,
@@ -115,10 +115,12 @@ class NeuroEvolution(NeuralManager):
         self._save_state_to_file(data, filename)
 
     def export_network_to_file(self, filename: str = None) -> None:
+        "Export the best network to a file (used to evaluate the network later"
+
         return self._export_network_to_file(self.genomes[0].network, filename)
 
     def run_generation(self) -> float:
-        "Run a generation - return highscore"
+        "Run a generation - returns the highscore"
 
         self.generation += 1
         learning_rate = self._get_learning_rate()
@@ -172,12 +174,12 @@ class NeuroEvolution(NeuralManager):
 
         self.genomes.sort(key=lambda genome: genome.score, reverse=True)
 
-    def _get_learning_rate(self):
+    def _get_learning_rate(self) -> float:
         "Calculate the learning rate for the current generation"
 
         return self.learning_rate_base * (self.learning_rate_factor ** self.generation)
 
-    def _get_default_network(self):
+    def _get_default_network(self) -> NeuralNetwork:
         """
         Create a new network -> HAS to be overriden if creating a network from scratch
         or if repop_amount_random_add > 0

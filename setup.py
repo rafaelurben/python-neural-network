@@ -7,5 +7,5 @@ setup(
     author='Rafael Urben',
     author_email='github@rafaelurben.ch',
     packages=['neural_network'],
-    install_requires=[],
+    install_requires=["tqdm>=4.62.3"],
 )
